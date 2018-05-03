@@ -1,0 +1,71 @@
+---
+title: "Reproducible Reseach - week 2"
+author: "pokasombra"
+date: "May 2, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+First we need to unip the files, and then, read the table:
+
+```{r}
+unzip("activity_data.zip")
+adata <- read.csv("activity.csv")
+```
+
+We then calculate the sum, mean and medan of steps into R objects,  
+so that we can use them to include the values into the text with \`r
+
+```{r}
+total_steps <- sum(adata$steps, na.rm = TRUE)
+mean_steps <- mean(adata$steps, na.rm = TRUE)
+median_steps <- median(adata$steps, na.rm = TRUE)
+```
+
+The total number of steps is indicated by the `total_steps` object: **`r total_steps`**
+The histogram of the steps - we subset the data so that NA values are removes:
+```{r}
+library(ggplot2)
+qplot(adata$steps[!is.na(adata$steps)], main = "Histogram of Steps",
+      xlab = "Number of steps", ylab = "Count", binwidth = 50)
+```
+
+With the Histogram above, it is no surpirse that the *median* of the steps is **`r median_steps`**, and the mean is **`r mean_steps`**.
+
+
+**plotting an average daily pattern**: In order to plot an average daily pattern, we need
+to aggregate the values of every unique interval. One way to do this is using the aggregate function.
+```{r}
+average_interval <- aggregate(formula = steps ~ interval, data = adata, FUN = mean, na.rm = TRUE)
+ggplot(average_interval) + geom_line(aes(x = interval, y = steps)) + labs(title = "Average steps per interval", subtitle = "NAs were removed") + geom_vline(xintercept = average_interval$interval[which.max(average_interval$steps)], col = "red", linetype = "dashed")
+```
+
+The time interval with the maximum number of steps is *`r average_interval$interval[which.max(average_interval$steps)]`*,
+as indicated by the red dotted line in the time series above. This value was obtained by the formula
+`average_interval$interval[which.max(average_interval$steps)]`.
+
+
+*Working with NAs*:  
+There are a number of NAs in the series. To be precise, there are `r sum(is.na(adata$steps))` rows with NA in the steps.
+(obtained with `sum(is.na(adata$steps))`).  
+The strategy adopted to fill this elements is to use the average steps for the interval. The whole dataset can
+be obtained using the code:
+```{r}
+adata2 <- adata
+for(i in unique(adata$interval)) {
+  adata2$steps[adata2$interval == i][is.na(adata2$steps[adata2$interval == i])] <- average_interval[average_interval$interval == i, "steps"]
+}
+rm(i)
+```
+
+After this, we can use `sum(is.na(adata2$steps))` to see the number of NAs in `adata2`: **`r sum(is.na(adata2$steps))`**  
+Now, with the new, NA isempt, dataset, we can create a New Histogram:
+```{r}
+qplot(adata2$steps, main = "Histogram of Steps",
+      xlab = "Number of steps", ylab = "Count", binwidth = 50)
+```
+
+The new average is **`r mean(adata2$steps)`**, and the new median is **`r median(adata2$steps)`**.
