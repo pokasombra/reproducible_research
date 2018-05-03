@@ -11,7 +11,7 @@ adata <- read.csv("activity.csv")
 ```
 
 We then calculate the sum, mean and medan of steps into R objects,
-so that we can use them to include the values into the text with \`r
+so that we can use them to include the values into the text with \`r(...)\`
 
 ``` r
 total_steps <- sum(adata$steps, na.rm = TRUE)
