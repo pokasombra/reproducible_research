@@ -73,3 +73,18 @@ The new average is **`r mean(adata2$steps)`**, and the new median is **`r median
 Since we used the averade results to input the NA rows, it is no surprise that the "new" median and mean are
 exactly the same as before (in fact, it would be strange if it wasnt!).  
 Maybe using another method would produce different results.
+
+
+*Weekdays*:
+To see weekdays, we need to create a column that indicates which date of the week it is,
+then, we transform them to only "weekday" on "weekend".  
+Finally, we aggregate the values to create two plots.
+```{r}
+adata$wday <- weekdays(as.Date(as.character(adata$date), format = "%Y-%m-%d"))
+adata$wday[adata$wday == "Sunday" | adata$wday == "Saturday"] <- "weekend"
+adata$wday[adata$wday != "weekend"] <- "weekday"
+
+adata3 <- aggregate(steps ~ interval + wday, adata, mean)
+
+ggplot(adata3, aes(x = interval, y = steps)) + geom_line() + facet_grid(wday ~ .)
+```
