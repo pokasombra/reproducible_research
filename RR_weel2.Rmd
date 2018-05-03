@@ -69,3 +69,7 @@ qplot(adata2$steps, main = "Histogram of Steps",
 ```
 
 The new average is **`r mean(adata2$steps)`**, and the new median is **`r median(adata2$steps)`**.
+
+Since we used the averade results to input the NA rows, it is no surprise that the "new" median and mean are
+exactly the same as before (in fact, it would be strange if it wasnt!).  
+Maybe using another method would produce different results.
